@@ -3,6 +3,7 @@ package globalip
 import (
 	"fmt"
 	"log"
+	"time"
 
 	webrtc "github.com/pion/webrtc/v2"
 )
@@ -16,6 +17,12 @@ func GetIPaddr() string {
 			},
 		},
 	}
+	// 10秒のタイムアウト用タイマー
+	t := time.NewTicker(10 * time.Second)
+	defer func() {
+		t.Stop()
+		close(ch)
+	}()
 
 	// generate a new connection
 	peerConnection, err := webrtc.NewPeerConnection(config)
@@ -32,7 +39,6 @@ func GetIPaddr() string {
 			case webrtc.ICECandidateTypeSrflx:
 				log.Println("Public IP Address:", c.Address)
 				ch <- c.Address
-				close(ch)
 			}
 		}
 	})
@@ -54,6 +60,9 @@ func GetIPaddr() string {
 	select {
 	case addr := <-ch:
 		return addr
+	case <-t.C:
+		return "error"
+
 	}
 	fmt.Println("done")
 	return "error"
