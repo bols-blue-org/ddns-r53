@@ -35,7 +35,7 @@ var flagDefine = []cli.Flag{
 		Name:    "profile",
 		Aliases: []string{"p"},
 		Value:   "ated",
-		Usage:   "aws route53 zone id",
+		Usage:   "aws profile name. ~/aws/config and ~/aws/profile",
 		EnvVars: []string{"AWS_PROFILE"},
 	},
 }

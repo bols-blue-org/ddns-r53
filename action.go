@@ -41,13 +41,21 @@ func action(c *cli.Context) error {
 	defer func() {
 		t.Stop()
 	}()
-	lastIP := ""
 	fullDomain := name + "." + *domain
+	// 初回起動
+	addr := globalip.GetIPaddr()
+	if addr == "error" {
+		fmt.Println("can't get global ip address.")
+	} else {
+		fmt.Println("registration address:", addr)
+		awsr53.UpdateDNS(svc, fullDomain, addr, zoneid)
+	}
+	lastIP := addr
 	for {
 		select {
 		case <-t.C:
 			log.Println("2sec interval")
-			addr := globalip.GetIPaddr()
+			addr = globalip.GetIPaddr()
 
 			if addr == "error" {
 				fmt.Println("can't get global ip address.")
